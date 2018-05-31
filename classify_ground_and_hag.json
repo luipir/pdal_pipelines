@@ -1,0 +1,124 @@
+{
+  "pipeline":[
+
+    // load input data. Can be override via command line via:
+    // --readers.las.filename=<the new file>
+    {
+      "type":"readers.las",
+      "filename":"REAL-11.las"
+    },
+
+    // classify ground points using PMF
+    {
+      "type": "filters.pmf",
+      "slope":1.0,
+      "initial_distance":0.15,
+      "cell_size":1.0, // less than default affect gruping also some vertical components of the buildings, more than 1 create hols due depressions
+      "max_distance":6.5, // more than default 2.5 (at leaset 5.5) that seems affect slow ramps or depressions in the street
+      "exponential":true, // true or false seems does not affect
+      "max_window_size":33,
+      "last":true, // true or false seems does not affect this data set that almos have last points
+      "tag":"base_ground"
+    },
+
+    // get all points not classified as ground
+    {
+      "type":"filters.range",
+      "limits":"Classification![2:2]",
+      "inputs":[
+        "base_ground"
+      ],
+      "tag":"not_ground"
+    },
+
+    // reduce number of points to speedup cleanups of ground points
+    {
+      "type":"filters.range",
+      "limits":"Classification[2:2]",
+      "inputs":[
+        "base_ground"
+      ],
+      "tag":"raw_ground"
+    },
+
+    // Useful filters to remove artifacts from ground classification (e.g. building parts)
+    {
+      "type":"filters.kdistance",
+      "k":100, // higher value create more class differentiation. This create more difficult to filter
+               // artifacts with range filter below. BTW more K more processing time in a log proportion
+      "inputs":[
+        "raw_ground"
+      ],
+      "tag":"kdistance_ground"
+    },
+    {
+      "type":"filters.range",
+      "limits":"KDistance[0:1.2]",
+      "tag":"cleaned_ground"
+    },
+
+    //
+    // the following filter allow renmove holes in the street
+    // but does not remove any points wrongly classifiad as 
+    // ground but come from buildings
+    // the drawback if the computation time
+    // {
+    //   "type":"filters.approximatecoplanar",
+    //   "knn":8,
+    //   "thresh1":25,
+    //   "thresh2":6
+    // },
+    // {
+    //   "type":"filters.range",
+    //   "limits":"Coplanar[1:1]"
+    // },
+    //
+    // the following filter does not remove artifacts and generate new ones
+    // {
+    //   "type":"filters.lof",
+    //   "minpts":20
+    // },
+    // {
+    //   "type":"filters.range",
+    //   "limits":"LocalOutlierFactor[:1.2]"
+    // },
+    //
+    //
+    // {
+    //   "type":"filters.iqr",
+    //   "dimension":"Z",
+    //   "k":3
+    // },
+
+    // merge the ground with the original layer without ground
+    {
+      "type":"filters.merge",
+      "inputs":[
+        "cleaned_ground",
+        "not_ground"
+      ],
+      "tag":"classified_with_ground"
+    },
+
+    // Calc HeightAboveGround (HAG) 
+    {
+      "type":"filters.hag"
+    },
+    // then change Z with the HAG value
+    // {
+    //   "type":"filters.ferry",
+    //   "dimensions":"HeightAboveGround => Z"
+    // },
+
+    // generate output. Can be override via command line via:
+    // --writers.las.filename=<the new file>
+    {
+      "type":"writers.las",
+      "filename":"out.las",
+      // aadd all dimensions generated during previous processings
+      // otherwise only LAS dimensions are saved
+      "extra_dims":"all"
+    }
+  ]
+}
+
