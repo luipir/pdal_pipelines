@@ -4,7 +4,7 @@
 
 this is only an example of CLI call
 
-pdal pipeline -i ./classify_ground_and_hag.json --verbose 8 --readers.las.filename=source.las --writers.las.filename=destination.las
+pdal pipeline -i ./yourpipeline.json --verbose 8 --readers.las.filename=source.las --writers.las.filename=destination.las
 
 # obtain feedback
 
