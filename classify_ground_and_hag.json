@@ -19,18 +19,19 @@
     // --readers.las.filename=<the new file>
     {
       "type":"readers.las",
-      "filename":"REAL-11.las"
+      "filename":"input.las"
     },
 
     // classify ground points using PMF
     {
       "type": "filters.pmf",
       "slope":1.0,
-      "initial_distance":0.15,
+      "initial_distance":0.35, // for noisy flat data (sometimes happen for some little areas)
       "cell_size":1.0, // less than default affect gruping also some vertical components of the buildings, more than 1 create hols due depressions
-      "max_distance":6.5, // more than default 2.5 (at leaset 5.5) that seems affect slow ramps or depressions in the street
+      // "max_distance":6.5, // more than default 2.5 (at leaset 5.5) that seems affect slow ramps or depressions in the street
+      "max_distance":1.7, // Dh over that is considered ground. For mobile set the hight of a car = 1.5m
       "exponential":true, // true or false seems does not affect
-      "max_window_size":33,
+      "max_window_size":3.5, // width of the object to preserve, for mobile the witdh of a car = 3m. For aereal the size of a building
       "last":true, // true or false seems does not affect this data set that almos have last points
       "tag":"base_ground"
     },
@@ -67,7 +68,7 @@
     },
     {
       "type":"filters.range",
-      "limits":"KDistance[0:1.2]",
+      "limits":"KDistance[0:1.7]",
       "tag":"cleaned_ground"
     },
 
