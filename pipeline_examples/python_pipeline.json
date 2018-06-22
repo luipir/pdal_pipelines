@@ -1,0 +1,27 @@
+{
+    "pipeline":[
+        // load input data. Can be override via command line via:
+        // --readers.las.filename=<the new file>
+        {
+            "type":"readers.las",
+            "filename":"OverrideThisFilename.las",
+            "tag":"input"
+        },
+        {
+            "type" : "filters.python",
+            "function":"example",
+            "module":"anything",
+            "script":"python_pipeline.py"
+        },
+        // generate output. Can be override via command line via:
+        // --writers.las.filename=<the new file>
+        {
+            "type":"writers.las",
+            "filename":"OverrideThisFilename.las",
+            // aadd all dimensions generated during previous processings
+            // otherwise only LAS dimensions are saved
+            "extra_dims":"all"
+        }
+  
+    ]
+  }
