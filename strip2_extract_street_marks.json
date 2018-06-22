@@ -1,0 +1,51 @@
+/***************************************************************************
+  classify_ground_and_hag.json
+  --------------------------------------
+  Date                 : May 2018
+  Copyright            : (C) 2018 by Luigi Pirelli
+  Email                : luipir at gmail dot com
+ ***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+// This pipeline try extract street marks working on intensity range values
+// working only on ground points. Basing on eristics, Intensity limits of 
+// Strip2 is [1600:2000]
+{
+  "pipeline":[
+
+    // load input data. Can be override via command line via:
+    // --readers.las.filename=<the new file>
+    {
+      "type":"readers.las",
+      "filename":"classified.las"
+    },
+
+    // get all street marks
+    {
+      "type":"filters.range",
+      "limits":"Classification[2:2],Intensity[1600:2000]"
+    },
+    {
+      "type":"filters.cluster",
+      // Cluster too big leave portion unclassified. If too little create too many clusters
+      "min_points":50
+    },
+
+    // generate output. Can be override via command line via:
+    // --writers.las.filename=<the new file>
+    {
+      "type":"writers.las",
+      "filename":"out.las",
+      // aadd all dimensions generated during previous processings
+      // otherwise only LAS dimensions are saved
+      "extra_dims":"all"
+    }
+  ]
+}
+
