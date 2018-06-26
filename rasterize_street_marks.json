@@ -1,0 +1,57 @@
+/***************************************************************************
+  classify_ground_and_hag.json
+  --------------------------------------
+  Date                 : May 2018
+  Copyright            : (C) 2018 by Luigi Pirelli
+  Email                : luipir at gmail dot com
+ ***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+// This pipeline rasterise a point cloud to a by default 0.05 resolution
+// resolution is a divisor of resolution used on PNOA raster data => 
+// facilitate pixel matching
+{
+  "pipeline":[
+
+    // load input data. Can be override via command line via:
+    // --readers.las.filename=<the new file>
+    {
+      "type":"readers.las",
+      "filename":"input.las",
+      "extra_dims": "ClusterID=uint8"
+    },
+
+    // generate output. Can be override via command line via:
+    // --writers.las.filename=<the new file>
+    {
+      "type":"writers.gdal",
+      "filename":"out.tif",
+      "resolution":0.05,
+      // Data type for output grid ("int8", "uint64", ", "float", etc.)
+      "data_type":"uint8",
+      // dimension to use to fill raster value
+      "dimension":"ClusterID",
+      // Statistics produced ('min', 'max', 'mean', 'idw', 'count', 'stdev' or 'all')
+      "output_type":"min",
+      // GDAL driver options (name=value,name=value...)
+      "gdalopts":"b=1",
+      "nodata":0
+      // Bounds would be necessary. It's not asked if the pipeline is executed with --nostream
+      // IMHO it's a pdal bug
+      // "bounds": [
+      //   [ 547401.98999999999, 4801382.6299999999 ],
+      //   [ 547401.98999999999, 4801517.6500000004 ],
+      //   [ 547520.68999999994, 4801517.6500000004 ],
+      //   [ 547520.68999999994, 4801382.6299999999 ],
+      //   [ 547401.98999999999, 4801382.6299999999 ]
+      // ]
+    }
+  ]
+}
+
