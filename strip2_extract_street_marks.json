@@ -14,7 +14,7 @@
  ***************************************************************************/
 
 // This pipeline try extract street marks working on intensity range values
-// working only on ground points. Basing on eristics, Intensity limits of 
+// working only on ground points. Basing on euristics, Intensity limits of 
 // Strip2 is [1600:2000]
 {
   "pipeline":[
